@@ -6,6 +6,30 @@ export default function Dashboard({ stats, charts }) {
         <AppLayout title="Dashboard">
             <h1 className="text-3xl font-bold mb-8">Dashboard</h1>
 
+            <div className="flex gap-3 mb-8">
+                <a
+                    href={route('dashboard.export.orders')}
+                    className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"
+                >
+                    Export orders (CSV)
+                </a>
+
+                <a
+                    href={route('dashboard.export.low-stock')}
+                    className="bg-red-600 text-white px-4 py-2 rounded hover:bg-red-700"
+                >
+                    Export low stock (CSV)
+                </a>
+
+                <a
+                    href={route('export.daily-sales.pdf')}
+                    className="bg-gray-800 text-white px-4 py-2 rounded hover:bg-gray-900"
+                    target="_blank"
+                >
+                    Daily sales report (PDF)
+                </a>
+            </div>
+
             {/* METRICS */}
             <div className="grid grid-cols-4 gap-4 mb-10">
                 <Stat

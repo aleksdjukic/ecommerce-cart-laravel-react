@@ -2,8 +2,10 @@
 
 namespace App\Http\Controllers;
 
-use App\Services\Dashboard\DashboardService;
+use App\Exports\LowStockCsvExport;
+use App\Exports\OrdersCsvExport;
 use App\Services\Dashboard\DashboardChartService;
+use App\Services\Dashboard\DashboardService;
 use Inertia\Inertia;
 
 class DashboardController
@@ -18,5 +20,15 @@ class DashboardController
                 'sales7days' => $charts->salesLast7Days(),
             ],
         ]);
+    }
+
+    public function exportOrders(OrdersCsvExport $export)
+    {
+        return $export->download();
+    }
+
+    public function exportLowStock(LowStockCsvExport $export)
+    {
+        return $export->download();
     }
 }

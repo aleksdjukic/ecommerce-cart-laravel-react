@@ -1,12 +1,15 @@
 <?php
 
+use App\Exports\OrdersCsvExport;
 use App\Http\Controllers\DashboardController;
+use App\Services\Reports\DailySalesPdfService;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 
 
 Route::middleware(['auth'])->group(function () {
 
+     // SPA pages
     Route::get('/products', function () {
         return Inertia::render('Products/Index');
     })->name('products.index');
@@ -18,21 +21,23 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/checkout', function () {
         return Inertia::render('Checkout/Index');
     })->name('checkout.index');
-});
 
-Route::middleware(['auth'])->group(function () {
+
+    // Dashboard
     Route::get('/dashboard', [DashboardController::class, 'index'])
         ->name('dashboard');
-});
 
-Route::middleware(['auth'])->group(function () {
-    Route::get('/export/orders/csv', fn () =>
-        app(\App\Exports\OrdersCsvExport::class)->download()
-    );
+    // Exports
+
+    Route::get('/dashboard/export/orders', [DashboardController::class, 'exportOrders'])
+        ->name('dashboard.export.orders');
+
+    Route::get('/dashboard/export/low-stock', [DashboardController::class, 'exportLowStock'])
+        ->name('dashboard.export.low-stock');
 
     Route::get('/export/daily-sales/pdf', fn () =>
-        app(\App\Services\Reports\DailySalesPdfService::class)->generate()
-    );
+        app(DailySalesPdfService::class)->generate()
+    )->name('export.daily-sales.pdf');
 });
 
 require __DIR__.'/auth.php';
