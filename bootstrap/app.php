@@ -4,6 +4,7 @@ use App\Exceptions\InsufficientStockException;
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
+use Illuminate\Http\Request;
 use Symfony\Component\HttpFoundation\Response;
 
 
@@ -27,11 +28,13 @@ return Application::configure(basePath: dirname(__DIR__))
 
         $exceptions->render(function (
             InsufficientStockException $e,
-            $request
+            Request $request
         ) {
-            return response()->json([
-                'message' => $e->getMessage(),
-            ], Response::HTTP_UNPROCESSABLE_ENTITY);
+            if ($request->expectsJson()) {
+                return response()->json([
+                    'message' => $e->getMessage(),
+                ], Response::HTTP_CONFLICT); // 409
+            }
         });
 
     })
