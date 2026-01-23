@@ -1,42 +1,83 @@
 import { useEffect, useState } from 'react';
 import AppLayout from '@/Layouts/AppLayout';
-import axios from 'axios';
+import {
+    fetchCart,
+    updateCartItem,
+    removeCartItem,
+} from '@/api/cart';
 
 export default function Cart() {
     const [cart, setCart] = useState(null);
+    const [loading, setLoading] = useState(true);
 
-    const loadCart = () => {
-        axios.get('/api/cart')
-            .then(res => setCart(res.data.data));
+    const loadCart = async () => {
+        setLoading(true);
+        const res = await fetchCart();
+        setCart(res.data.data);
+        setLoading(false);
     };
 
-    useEffect(loadCart, []);
+    useEffect(() => {
+        loadCart();
+    }, []);
 
-    const updateQty = (itemId, qty) => {
-        axios.patch(`/api/cart/items/${itemId}`, { quantity: qty })
-            .then(loadCart)
-            .catch(err => alert(err.response.data.message));
-    };
-
-    const removeItem = (itemId) => {
-        axios.delete(`/api/cart/items/${itemId}`)
-            .then(loadCart);
-    };
-
-    if (!cart) return null;
+    if (loading) return <div>Loading…</div>;
+    if (!cart || cart.items.length === 0) {
+        return <AppLayout><p>Cart is empty.</p></AppLayout>;
+    }
 
     return (
-        <AppLayout>
+        <AppLayout title="Cart">
             <h1 className="text-2xl font-bold mb-4">Cart</h1>
 
             {cart.items.map(item => (
-                <div key={item.id} className="flex gap-4 mb-2">
-                    <div>{item.product.name}</div>
-                    <div>Qty: {item.quantity}</div>
+                <div
+                    key={item.id}
+                    className="flex items-center gap-4 border p-3 mb-2"
+                >
+                    <div className="flex-1">
+                        <div className="font-semibold">
+                            {item.product.name}
+                        </div>
+                        <div className="text-sm text-gray-500">
+                            Stock: {item.product.stock_quantity}
+                        </div>
+                    </div>
 
-                    <button onClick={() => updateQty(item.id, item.quantity + 1)}>+</button>
-                    <button onClick={() => updateQty(item.id, item.quantity - 1)}>-</button>
-                    <button onClick={() => removeItem(item.id)}>Remove</button>
+                    <div className="flex items-center gap-2">
+                        <button
+                            onClick={() =>
+                                updateCartItem(item.id, item.quantity - 1)
+                                    .then(loadCart)
+                            }
+                            disabled={item.quantity <= 1}
+                        >
+                            -
+                        </button>
+
+                        <span>{item.quantity}</span>
+
+                        <button
+                            onClick={() =>
+                                updateCartItem(item.id, item.quantity + 1)
+                                    .then(loadCart)
+                            }
+                            disabled={
+                                item.quantity >= item.product.stock_quantity
+                            }
+                        >
+                            +
+                        </button>
+                    </div>
+
+                    <button
+                        className="text-red-600"
+                        onClick={() =>
+                            removeCartItem(item.id).then(loadCart)
+                        }
+                    >
+                        Remove
+                    </button>
                 </div>
             ))}
         </AppLayout>

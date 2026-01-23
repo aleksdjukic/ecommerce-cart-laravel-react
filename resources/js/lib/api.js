@@ -2,14 +2,12 @@ import axios from 'axios';
 
 const api = axios.create({
     baseURL: '/api',
+    withCredentials: true,
     headers: {
-        'Accept': 'application/json',
+        Accept: 'application/json',
         'X-Requested-With': 'XMLHttpRequest',
     },
-    withCredentials: true,
 });
-
-export default api;
 
 api.interceptors.response.use(
     response => response,
@@ -21,18 +19,16 @@ api.interceptors.response.use(
             return Promise.reject(error);
         }
 
-        const status = response.status;
-        const data = response.data;
-
-        if (status === 403) {
-            alert(data.message ?? 'Forbidden');
+        if (response.status === 422 && response.data?.message) {
+            alert(response.data.message);
         }
 
-        if (status === 422 && data.message) {
-            // business rule error (stock)
-            alert(data.message);
+        if (response.status === 403) {
+            alert(response.data?.message ?? 'Forbidden');
         }
 
         return Promise.reject(error);
     }
 );
+
+export default api;
