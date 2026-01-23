@@ -46,6 +46,11 @@ class CheckoutService
                     event(new ProductStockLow($product));
                 }
 
+                Log::warning('Product stock low', [
+                    'product_id' => $product->id,
+                    'stock' => $product->stock_quantity,
+                ]);
+
                 $totalPrice += $item->quantity * $product->price;
             }
 
