@@ -2,19 +2,22 @@
 
 namespace App\Services;
 
+use App\Events\ProductStockLow;
 use App\Exceptions\InsufficientStockException;
 use App\Models\Order;
+use App\Models\User;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 
 class CheckoutService
 {
-    public function checkout($user): Order
+    public function checkout(User $user): Order
     {
         return DB::transaction(function () use ($user) {
 
             $cart = $user->cart()
                 ->with('items.product')
+                ->lockForUpdate()
                 ->firstOrFail();
 
             if ($cart->items->isEmpty()) {
@@ -34,7 +37,13 @@ class CheckoutService
                     );
                 }
 
+                // decrement stock
                 $product->decrement('stock_quantity', $item->quantity);
+
+                // 🔔 LOW STOCK EVENT
+                if ($product->stock_quantity <= config('shop.low_stock_threshold')) {
+                    event(new ProductStockLow($product));
+                }
 
                 $totalPrice += $item->quantity * $product->price;
             }
@@ -52,6 +61,7 @@ class CheckoutService
                 ]);
             }
 
+            // clear cart
             $cart->items()->delete();
 
             Log::info('Checkout completed', [
