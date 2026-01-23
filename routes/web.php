@@ -25,5 +25,14 @@ Route::middleware(['auth'])->group(function () {
         ->name('dashboard');
 });
 
+Route::middleware(['auth'])->group(function () {
+    Route::get('/export/orders/csv', fn () =>
+        app(\App\Exports\OrdersCsvExport::class)->download()
+    );
+
+    Route::get('/export/daily-sales/pdf', fn () =>
+        app(\App\Services\Reports\DailySalesPdfService::class)->generate()
+    );
+});
 
 require __DIR__.'/auth.php';
