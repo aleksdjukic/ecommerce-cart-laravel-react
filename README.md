@@ -4,6 +4,7 @@
 ![PHP](https://img.shields.io/badge/PHP-8.4-blue)
 ![React](https://img.shields.io/badge/React-Inertia.js-61dafb)
 ![Vite](https://img.shields.io/badge/Vite-Frontend-purple)
+![CI](https://github.com/aleksdjukic/ecommerce-cart-laravel-react/actions/workflows/ci.yml/badge.svg)
 ![Tests](https://img.shields.io/badge/Tests-Passing-brightgreen)
 
 Demo e-commerce application built with **Laravel 12**, **Inertia.js**, and **React**.  
