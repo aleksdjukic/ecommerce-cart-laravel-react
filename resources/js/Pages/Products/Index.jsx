@@ -1,35 +1,39 @@
 import { useEffect, useState } from 'react';
 import AppLayout from '@/Layouts/AppLayout';
-import axios from 'axios';
+import { fetchProducts } from '@/api/products';
+import { addToCart } from '@/api/cart';
 
 export default function Products() {
     const [products, setProducts] = useState([]);
 
     useEffect(() => {
-        axios.get('/api/products')
-            .then(res => setProducts(res.data.data));
+        fetchProducts().then(response => {
+            setProducts(response.data.data);
+        });
     }, []);
 
-    const addToCart = (productId) => {
-        axios.post('/api/cart/items', { product_id: productId })
-            .then(() => alert('Added to cart'))
-            .catch(err => alert(err.response.data.message));
+    const handleAddToCart = (product) => {
+        addToCart(product.id);
     };
 
     return (
-        <AppLayout>
-            <h1 className="text-2xl font-bold mb-4">Products</h1>
-
-            <div className="grid grid-cols-3 gap-4">
-                {products.map(p => (
-                    <div key={p.id} className="border p-4 rounded">
-                        <h2 className="font-semibold">{p.name}</h2>
-                        <p>${p.price}</p>
-                        <p>Stock: {p.stock_quantity}</p>
+        <AppLayout title="Products">
+            <div className="space-y-4">
+                {products.map(product => (
+                    <div
+                        key={product.id}
+                        className="flex justify-between border p-4"
+                    >
+                        <div>
+                            <h2 className="font-bold">{product.name}</h2>
+                            <p>${product.price}</p>
+                            <p>Stock: {product.stock_quantity}</p>
+                        </div>
 
                         <button
-                            onClick={() => addToCart(p.id)}
-                            className="mt-2 px-3 py-1 bg-blue-600 text-white rounded"
+                            disabled={product.stock_quantity === 0}
+                            onClick={() => handleAddToCart(product)}
+                            className="bg-blue-500 text-white px-4 py-2 disabled:opacity-50"
                         >
                             Add to cart
                         </button>
