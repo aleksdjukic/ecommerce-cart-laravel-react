@@ -18,4 +18,9 @@ Route::middleware(['auth'])->group(function () {
     })->name('checkout.index');
 });
 
+Route::middleware(['auth'])->get('/dashboard', function () {
+    return redirect()->route('products.index');
+})->name('dashboard');
+
+
 require __DIR__.'/auth.php';
