@@ -5,10 +5,12 @@ import {
     updateCartItem,
     removeCartItem,
 } from '@/api/cart';
+import { checkout } from '@/api/checkout';
 
 export default function Cart() {
     const [cart, setCart] = useState(null);
     const [loading, setLoading] = useState(true);
+    const [processing, setProcessing] = useState(false);
 
     const loadCart = async () => {
         setLoading(true);
@@ -21,9 +23,21 @@ export default function Cart() {
         loadCart();
     }, []);
 
+    const handleCheckout = async () => {
+        setProcessing(true);
+        await checkout();
+        await loadCart();
+        setProcessing(false);
+    };
+
     if (loading) return <div>Loading…</div>;
+
     if (!cart || cart.items.length === 0) {
-        return <AppLayout><p>Cart is empty.</p></AppLayout>;
+        return (
+            <AppLayout title="Cart">
+                <p>Cart is empty.</p>
+            </AppLayout>
+        );
     }
 
     return (
@@ -80,6 +94,16 @@ export default function Cart() {
                     </button>
                 </div>
             ))}
+
+            <div className="mt-6">
+                <button
+                    className="bg-black text-white px-4 py-2 disabled:opacity-50"
+                    disabled={processing}
+                    onClick={handleCheckout}
+                >
+                    {processing ? 'Processing…' : 'Checkout'}
+                </button>
+            </div>
         </AppLayout>
     );
 }
