@@ -1,10 +1,11 @@
 <?php
 
 use App\Exceptions\InsufficientStockException;
+use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
-use Illuminate\Http\Request;
+use Illuminate\Validation\ValidationException;
 use Symfony\Component\HttpFoundation\Response;
 
 
@@ -26,14 +27,40 @@ return Application::configure(basePath: dirname(__DIR__))
     })
      ->withExceptions(function (Exceptions $exceptions): void {
 
+        // 422 — Validation errors
+        $exceptions->render(function (
+            ValidationException $e,
+            $request
+        ) {
+            if ($request->expectsJson()) {
+                return response()->json([
+                    'message' => 'Validation failed',
+                    'errors'  => $e->errors(),
+                ], Response::HTTP_UNPROCESSABLE_ENTITY);
+            }
+        });
+
+        // 403 — Authorization
+        $exceptions->render(function (
+            AuthorizationException $e,
+            $request
+        ) {
+            if ($request->expectsJson()) {
+                return response()->json([
+                    'message' => 'You are not allowed to perform this action',
+                ], Response::HTTP_FORBIDDEN);
+            }
+        });
+
+        // 422 — Business rule (stock)
         $exceptions->render(function (
             InsufficientStockException $e,
-            Request $request
+            $request
         ) {
             if ($request->expectsJson()) {
                 return response()->json([
                     'message' => $e->getMessage(),
-                ], Response::HTTP_CONFLICT); // 409
+                ], Response::HTTP_UNPROCESSABLE_ENTITY);
             }
         });
 
