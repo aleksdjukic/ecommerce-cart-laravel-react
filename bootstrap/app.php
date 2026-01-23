@@ -6,28 +6,49 @@ use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
 use Illuminate\Validation\ValidationException;
+use Laravel\Sanctum\Http\Middleware\EnsureFrontendRequestsAreStateful;
 use Symfony\Component\HttpFoundation\Response;
 
 
 
 return Application::configure(basePath: dirname(__DIR__))
     ->withRouting(
-        web: __DIR__.'/../routes/web.php',
-        api: __DIR__.'/../routes/api.php',
-        commands: __DIR__.'/../routes/console.php',
+        web: __DIR__ . '/../routes/web.php',
+        api: __DIR__ . '/../routes/api.php',
+        commands: __DIR__ . '/../routes/console.php',
         health: '/up',
     )
+
     ->withMiddleware(function (Middleware $middleware): void {
+
+        /*
+        |--------------------------------------------------------------------------
+        | Web Middleware (Inertia)
+        |--------------------------------------------------------------------------
+        */
         $middleware->web(append: [
             \App\Http\Middleware\HandleInertiaRequests::class,
             \Illuminate\Http\Middleware\AddLinkHeadersForPreloadedAssets::class,
         ]);
 
-        //
+        /*
+        |--------------------------------------------------------------------------
+        | API Middleware (Sanctum SPA)
+        |--------------------------------------------------------------------------
+        | React/Inertia SPA
+        */
+        $middleware->api(prepend: [
+            EnsureFrontendRequestsAreStateful::class,
+        ]);
     })
-     ->withExceptions(function (Exceptions $exceptions): void {
 
-        // 422 — Validation errors
+    ->withExceptions(function (Exceptions $exceptions): void {
+
+        /*
+        |--------------------------------------------------------------------------
+        | 422 — Validation errors
+        |--------------------------------------------------------------------------
+        */
         $exceptions->render(function (
             ValidationException $e,
             $request
@@ -40,7 +61,11 @@ return Application::configure(basePath: dirname(__DIR__))
             }
         });
 
-        // 403 — Authorization
+        /*
+        |--------------------------------------------------------------------------
+        | 403 — Authorization
+        |--------------------------------------------------------------------------
+        */
         $exceptions->render(function (
             AuthorizationException $e,
             $request
@@ -52,7 +77,11 @@ return Application::configure(basePath: dirname(__DIR__))
             }
         });
 
-        // 422 — Business rule (stock)
+        /*
+        |--------------------------------------------------------------------------
+        | 422 — Business rule (stock)
+        |--------------------------------------------------------------------------
+        */
         $exceptions->render(function (
             InsufficientStockException $e,
             $request
@@ -63,6 +92,6 @@ return Application::configure(basePath: dirname(__DIR__))
                 ], Response::HTTP_UNPROCESSABLE_ENTITY);
             }
         });
-
     })
+
     ->create();
