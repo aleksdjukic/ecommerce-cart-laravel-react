@@ -9,9 +9,12 @@ use App\Http\Resources\CartResource;
 use App\Models\CartItem;
 use App\Services\CartService;
 use Illuminate\Http\Request;
+use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 
 class CartController extends Controller
 {
+    use AuthorizesRequests;
+
     public function show(Request $request, CartService $cartService)
     {
         $cart = $cartService->getOrCreateCart($request->user());
@@ -34,6 +37,8 @@ class CartController extends Controller
         CartItem $item,
         CartService $cartService
     ) {
+        $this->authorize('update', $item);
+
         $cartService->updateQuantity($item, $request->quantity);
 
         return response()->json(['message' => 'Cart updated']);
@@ -41,6 +46,8 @@ class CartController extends Controller
 
     public function destroy(CartItem $item, CartService $cartService)
     {
+        $this->authorize('delete', $item);
+
         $cartService->removeItem($item);
 
         return response()->json(['message' => 'Item removed']);
