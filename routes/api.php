@@ -1,8 +1,10 @@
 <?php
 
-use App\Http\Controllers\Api\ProductController;
 use App\Http\Controllers\Api\CartController;
+use App\Http\Controllers\Api\CheckoutController;
+use App\Http\Controllers\Api\ProductController;
 use Illuminate\Support\Facades\Route;
+
 
 Route::middleware('auth:sanctum')->group(function () {
 
@@ -22,4 +24,8 @@ Route::middleware('auth:sanctum')->group(function () {
 
     Route::delete('/cart/items/{item}', [CartController::class, 'destroy'])
         ->name('api.cart.items.destroy');
-});
+
+    // Checkout
+    Route::post('/checkout', [CheckoutController::class, 'store'])
+        ->name('api.checkout.store');
+    });
