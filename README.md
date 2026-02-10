@@ -28,6 +28,7 @@ This is **not a production system**, but a **showcase**.
 - Row-level locking to prevent overselling
 - Creates orders and order items
 - Clears cart after successful checkout
+- Sends order confirmation email
 
 ### 📊 Dashboard
 - Revenue today
