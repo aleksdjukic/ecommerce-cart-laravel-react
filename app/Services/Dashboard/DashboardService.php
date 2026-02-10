@@ -31,7 +31,11 @@ class DashboardService
 
             'average_order_value' => Order::avg('total_price'),
 
-            'low_stock_products' => Product::where('stock_quantity', '<=', 5)
+            'low_stock_products' => Product::where(
+                'stock_quantity',
+                '<=',
+                (int) config('shop.low_stock_threshold', 5)
+            )
                 ->orderBy('stock_quantity')
                 ->limit(5)
                 ->get(),
