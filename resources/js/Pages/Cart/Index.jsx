@@ -24,10 +24,18 @@ export default function Cart() {
             return null;
         }
 
-        return date.toLocaleTimeString([], {
-            hour: '2-digit',
-            minute: '2-digit',
-        });
+        const msRemaining = date.getTime() - Date.now();
+        const minutesRemaining = Math.ceil(msRemaining / 60000);
+
+        if (minutesRemaining <= 0) {
+            return 'Expires soon';
+        }
+
+        if (minutesRemaining === 1) {
+            return 'Expires in 1 min';
+        }
+
+        return `Expires in ${minutesRemaining} min`;
     };
 
     const notify = (msg) => {
@@ -94,7 +102,7 @@ export default function Cart() {
                                 </div>
                                     {reservedTime && (
                                         <div className="text-xs text-gray-400">
-                                            Reserved until {reservedTime}
+                                            {reservedTime}
                                         </div>
                                     )}
                                 </div>
