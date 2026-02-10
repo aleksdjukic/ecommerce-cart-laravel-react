@@ -122,6 +122,15 @@ php artisan serve
 
 ---
 
+## ⚙️ Config cache
+
+For local development, `composer dev` clears config cache before starting.  
+When you want cached config (e.g., production-like runs), use:
+
+composer cache-config
+
+---
+
 ## 🔐 Authentication
 
 Uses **Laravel Sanctum SPA authentication**.
