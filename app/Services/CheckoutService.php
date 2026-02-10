@@ -38,18 +38,22 @@ class CheckoutService
                     );
                 }
 
+                $threshold = (int) config('shop.low_stock_threshold', 5);
+                $oldStock = $product->stock_quantity;
+                $newStock = $oldStock - $item->quantity;
+
                 // decrement stock
                 $product->decrement('stock_quantity', $item->quantity);
 
-                // 🔔 LOW STOCK EVENT
-                if ($product->stock_quantity <= config('shop.low_stock_threshold')) {
+                // 🔔 LOW STOCK EVENT (only on threshold crossing)
+                if ($oldStock > $threshold && $newStock <= $threshold) {
                     event(new ProductStockLow($product));
-                }
 
-                Log::warning('Product stock low', [
-                    'product_id' => $product->id,
-                    'stock' => $product->stock_quantity,
-                ]);
+                    Log::warning('Product stock low', [
+                        'product_id' => $product->id,
+                        'stock' => $newStock,
+                    ]);
+                }
 
                 $totalPrice += $item->quantity * $product->price;
             }
