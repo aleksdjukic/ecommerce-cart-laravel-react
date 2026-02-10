@@ -31,12 +31,13 @@ class CartService
 
         DB::transaction(function () use ($cart, $product) {
 
+            /** @var CartItem|null $item */
             $item = $cart->items()
                 ->where('product_id', $product->id)
                 ->lockForUpdate()
                 ->first();
 
-            $currentQuantity = $item?->quantity ?? 0;
+            $currentQuantity = $item ? $item->quantity : 0;
 
             if ($currentQuantity + 1 > $product->stock_quantity) {
                 Log::warning('Insufficient stock when adding to cart', [
@@ -74,6 +75,7 @@ class CartService
         DB::transaction(function () use ($item, $quantity) {
 
             $item->refresh();
+            /** @var Product $product */
             $product = $item->product()->lockForUpdate()->first();
 
             if ($quantity > $product->stock_quantity) {

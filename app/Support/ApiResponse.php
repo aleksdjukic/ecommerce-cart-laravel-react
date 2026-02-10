@@ -4,7 +4,7 @@ namespace App\Support;
 
 class ApiResponse
 {
-    public static function success($data = null, string $message = null, int $status = 200)
+    public static function success($data = null, ?string $message = null, int $status = 200)
     {
         return response()->json([
             'status'  => 'success',

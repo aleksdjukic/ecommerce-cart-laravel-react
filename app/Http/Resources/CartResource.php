@@ -5,14 +5,20 @@ namespace App\Http\Resources;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 
+/**
+ * @mixin \App\Models\Cart
+ */
 class CartResource extends JsonResource
 {
     public function toArray(Request $request): array
     {
+        /** @var \Illuminate\Database\Eloquent\Collection<int, \App\Models\CartItem> $items */
+        $items = $this->items;
+
         return [
             'id' => $this->id,
 
-            'items' => $this->items->map(fn ($item) => [
+            'items' => $items->map(fn ($item) => [
                 'id'       => $item->id,
                 'quantity' => $item->quantity,
                 'product'  => new ProductResource($item->product),
