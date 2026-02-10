@@ -12,6 +12,5 @@ class ProductStockLow
 
     public function __construct(
         public Product $product
-    ) {
-    }
+    ) {}
 }

@@ -8,8 +8,8 @@ use App\Http\Requests\UpdateCartItemRequest;
 use App\Http\Resources\CartResource;
 use App\Models\CartItem;
 use App\Services\CartService;
-use Illuminate\Http\Request;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
+use Illuminate\Http\Request;
 
 class CartController extends Controller
 {

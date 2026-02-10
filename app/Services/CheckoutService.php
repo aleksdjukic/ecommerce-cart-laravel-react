@@ -58,15 +58,15 @@ class CheckoutService
             }
 
             $order = Order::create([
-                'user_id'     => $user->id,
+                'user_id' => $user->id,
                 'total_price' => $totalPrice,
             ]);
 
             foreach ($cart->items as $item) {
                 $order->items()->create([
                     'product_id' => $item->product_id,
-                    'price'      => $item->product->price,
-                    'quantity'   => $item->quantity,
+                    'price' => $item->product->price,
+                    'quantity' => $item->quantity,
                 ]);
             }
 
@@ -75,8 +75,8 @@ class CheckoutService
 
             Log::info('Checkout completed', [
                 'order_id' => $order->id,
-                'user_id'  => $user->id,
-                'total'    => $totalPrice,
+                'user_id' => $user->id,
+                'total' => $totalPrice,
             ]);
 
             return $order;

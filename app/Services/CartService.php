@@ -42,8 +42,8 @@ class CartService
             if ($currentQuantity + 1 > $product->stock_quantity) {
                 Log::warning('Insufficient stock when adding to cart', [
                     'product_id' => $product->id,
-                    'requested'  => $currentQuantity + 1,
-                    'available'  => $product->stock_quantity,
+                    'requested' => $currentQuantity + 1,
+                    'available' => $product->stock_quantity,
                 ]);
 
                 throw new InsufficientStockException(
@@ -56,7 +56,7 @@ class CartService
             } else {
                 $cart->items()->create([
                     'product_id' => $product->id,
-                    'quantity'   => 1,
+                    'quantity' => 1,
                 ]);
             }
         });
@@ -69,6 +69,7 @@ class CartService
     {
         if ($quantity < 1) {
             $this->removeItem($item);
+
             return;
         }
 
@@ -81,8 +82,8 @@ class CartService
             if ($quantity > $product->stock_quantity) {
                 Log::warning('Insufficient stock when updating cart quantity', [
                     'product_id' => $product->id,
-                    'requested'  => $quantity,
-                    'available'  => $product->stock_quantity,
+                    'requested' => $quantity,
+                    'available' => $product->stock_quantity,
                 ]);
 
                 throw new InsufficientStockException(

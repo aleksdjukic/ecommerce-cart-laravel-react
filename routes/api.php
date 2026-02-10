@@ -5,7 +5,6 @@ use App\Http\Controllers\Api\CheckoutController;
 use App\Http\Controllers\Api\ProductController;
 use Illuminate\Support\Facades\Route;
 
-
 Route::middleware('auth:sanctum')->group(function () {
 
     // Products
@@ -28,4 +27,4 @@ Route::middleware('auth:sanctum')->group(function () {
     // Checkout
     Route::post('/checkout', [CheckoutController::class, 'store'])
         ->name('api.checkout.store');
-    });
+});

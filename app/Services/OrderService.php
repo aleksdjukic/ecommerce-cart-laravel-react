@@ -33,10 +33,10 @@ class OrderService
                 $product->decrement('stock_quantity', $item->quantity);
 
                 OrderItem::create([
-                    'order_id'  => $order->id,
-                    'product_id'=> $product->id,
-                    'price'     => $product->price,
-                    'quantity'  => $item->quantity,
+                    'order_id' => $order->id,
+                    'product_id' => $product->id,
+                    'price' => $product->price,
+                    'quantity' => $item->quantity,
                 ]);
 
                 $total += $product->price * $item->quantity;
@@ -48,8 +48,8 @@ class OrderService
 
             Log::info('Order placed', [
                 'order_id' => $order->id,
-                'user_id'  => $user->id,
-                'total'    => $total,
+                'user_id' => $user->id,
+                'total' => $total,
             ]);
 
             return $order;

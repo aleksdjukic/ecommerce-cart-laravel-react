@@ -1,15 +1,13 @@
 <?php
 
-use App\Exports\OrdersCsvExport;
 use App\Http\Controllers\DashboardController;
 use App\Services\Reports\DailySalesPdfService;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 
-
 Route::middleware(['auth'])->group(function () {
 
-     // SPA pages
+    // SPA pages
     Route::get('/products', function () {
         return Inertia::render('Products/Index');
     })->name('products.index');
@@ -21,7 +19,6 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/checkout', function () {
         return Inertia::render('Checkout/Index');
     })->name('checkout.index');
-
 
     // Dashboard
     Route::get('/dashboard', [DashboardController::class, 'index'])
@@ -35,8 +32,7 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/dashboard/export/low-stock', [DashboardController::class, 'exportLowStock'])
         ->name('dashboard.export.low-stock');
 
-    Route::get('/export/daily-sales/pdf', fn () =>
-        app(DailySalesPdfService::class)->generate()
+    Route::get('/export/daily-sales/pdf', fn () => app(DailySalesPdfService::class)->generate()
     )->name('export.daily-sales.pdf');
 });
 

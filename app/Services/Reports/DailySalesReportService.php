@@ -18,7 +18,7 @@ class DailySalesReportService
             ->get();
 
         $totalRevenue = $orders->sum('total_price');
-        $ordersCount  = $orders->count();
+        $ordersCount = $orders->count();
 
         Mail::to(config('shop.admin_email'))
             ->send(new DailySalesReportMail(

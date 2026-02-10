@@ -13,7 +13,7 @@ class CheckoutController extends Controller
         $order = $checkoutService->checkout($request->user());
 
         return response()->json([
-            'message'  => 'Order placed successfully',
+            'message' => 'Order placed successfully',
             'order_id' => $order->id,
         ]);
     }

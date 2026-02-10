@@ -8,6 +8,7 @@ use Illuminate\Console\Command;
 class SendDailySalesReport extends Command
 {
     protected $signature = 'report:daily-sales';
+
     protected $description = 'Send daily sales report to admin';
 
     public function handle(DailySalesReportService $service): int

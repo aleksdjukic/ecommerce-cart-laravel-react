@@ -2,11 +2,8 @@
 
 namespace Tests\Feature;
 
-use App\Events\ProductStockLow;
-use App\Jobs\SendLowStockNotificationJob;
 use App\Models\Product;
 use Illuminate\Foundation\Testing\RefreshDatabase;
-use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Queue;
 use Tests\TestCase;
 
@@ -22,7 +19,7 @@ class LowStockTest extends TestCase
             'stock_quantity' => 2,
         ]);
 
-        $listener = new \App\Listeners\DispatchLowStockNotification();
+        $listener = new \App\Listeners\DispatchLowStockNotification;
 
         $listener->handle(
             new \App\Events\ProductStockLow($product)
@@ -32,5 +29,4 @@ class LowStockTest extends TestCase
             \App\Jobs\SendLowStockNotificationJob::class
         );
     }
-
 }
