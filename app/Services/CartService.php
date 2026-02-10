@@ -36,6 +36,7 @@ class CartService
             ->where('cart_id', '!=', $excludeCart->id)
             ->sum('quantity');
     }
+
     /**
      * Get existing cart or create new one for user
      */

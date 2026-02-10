@@ -7,7 +7,6 @@ use App\Exceptions\InsufficientStockException;
 use App\Mail\OrderConfirmationMail;
 use App\Models\Order;
 use App\Models\User;
-use App\Services\CartService;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Mail;
