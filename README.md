@@ -147,6 +147,11 @@ Run all tests:
 
 php artisan test
 
+Static analysis & lint:
+
+vendor/bin/pint --test  
+vendor/bin/phpstan analyse --memory-limit=512M
+
 Covered areas:
 - Authentication flows
 - Cart & checkout logic
