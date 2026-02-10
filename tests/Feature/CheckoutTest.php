@@ -2,9 +2,11 @@
 
 namespace Tests\Feature;
 
+use App\Mail\OrderConfirmationMail;
 use App\Models\Product;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\Mail;
 use Tests\TestCase;
 
 class CheckoutTest extends TestCase
@@ -13,6 +15,8 @@ class CheckoutTest extends TestCase
 
     public function test_user_can_checkout_successfully(): void
     {
+        Mail::fake();
+
         $user = User::factory()->create();
 
         $product = Product::factory()->create([
@@ -47,6 +51,10 @@ class CheckoutTest extends TestCase
         $this->assertDatabaseMissing('cart_items', [
             'product_id' => $product->id,
         ]);
+
+        Mail::assertSent(OrderConfirmationMail::class, function ($mail) use ($user) {
+            return $mail->hasTo($user->email);
+        });
     }
 
     public function test_checkout_fails_when_stock_is_insufficient(): void

@@ -4,11 +4,13 @@ namespace App\Services;
 
 use App\Events\ProductStockLow;
 use App\Exceptions\InsufficientStockException;
+use App\Mail\OrderConfirmationMail;
 use App\Models\Order;
 use App\Models\User;
 use App\Services\CartService;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Mail;
 
 class CheckoutService
 {
@@ -75,6 +77,12 @@ class CheckoutService
 
             // clear cart
             $cart->items()->delete();
+
+            $order->load('items.product');
+
+            DB::afterCommit(function () use ($order, $user) {
+                Mail::to($user->email)->send(new OrderConfirmationMail($order));
+            });
 
             Log::info('Checkout completed', [
                 'order_id' => $order->id,
