@@ -6,7 +6,6 @@ use App\Events\ProductStockLow;
 use App\Exceptions\InsufficientStockException;
 use App\Models\Order;
 use App\Models\User;
-use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 
@@ -79,8 +78,6 @@ class CheckoutService
                 'user_id'  => $user->id,
                 'total'    => $totalPrice,
             ]);
-
-            Cache::forget('products.index');
 
             return $order;
         });
