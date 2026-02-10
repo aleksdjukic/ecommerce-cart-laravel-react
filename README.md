@@ -123,6 +123,21 @@ php artisan serve
 
 ---
 
+## 🏃‍♀️ How to run locally
+
+Quick start (SQLite):
+
+cp .env.example .env  
+php artisan key:generate  
+touch database/database.sqlite  
+php artisan migrate --seed  
+php artisan serve
+
+Notes:
+- `--seed` creates demo products only; register a user via the UI.
+
+---
+
 ## ⚙️ Config cache
 
 For local development, `composer dev` clears config cache before starting.  
@@ -172,6 +187,15 @@ Daily sales report is sent automatically using Laravel Scheduler.
 
 Email: demo@example.com  
 Password: password
+
+---
+
+## ⚠️ Tech debt / limitations
+
+- Demo auth and simple roles; no admin panel for user management.
+- Stock reservations are app-level and expire on access (no background cleanup).
+- Pricing is simplified (no taxes, shipping, discounts, or multi-currency).
+- No payment gateway integration.
 
 ---
 
