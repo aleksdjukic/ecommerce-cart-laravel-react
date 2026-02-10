@@ -13,19 +13,25 @@ class DashboardService
         $today = Carbon::today();
         $monthStart = Carbon::now()->startOfMonth();
 
-        $ordersToday = Order::whereDate('created_at', $today)->get();
-        $ordersMonth = Order::where('created_at', '>=', $monthStart)->get();
+        $ordersTodayRevenue = Order::whereDate('created_at', $today)
+            ->sum('total_price');
+        $ordersTodayCount = Order::whereDate('created_at', $today)->count();
+
+        $ordersMonthRevenue = Order::where('created_at', '>=', $monthStart)
+            ->sum('total_price');
+        $ordersMonthCount = Order::where('created_at', '>=', $monthStart)
+            ->count();
 
         return [
             'revenue' => [
-                'today' => $ordersToday->sum('total_price'),
-                'month' => $ordersMonth->sum('total_price'),
+                'today' => $ordersTodayRevenue,
+                'month' => $ordersMonthRevenue,
                 'total' => Order::sum('total_price'),
             ],
 
             'orders' => [
-                'today' => $ordersToday->count(),
-                'month' => $ordersMonth->count(),
+                'today' => $ordersTodayCount,
+                'month' => $ordersMonthCount,
                 'total' => Order::count(),
             ],
 
