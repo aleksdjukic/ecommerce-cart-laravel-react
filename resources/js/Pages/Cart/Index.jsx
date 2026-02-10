@@ -13,6 +13,23 @@ export default function Cart() {
     const [processing, setProcessing] = useState(false);
     const [toast, setToast] = useState(null);
 
+    const formatReservation = (reservedUntil) => {
+        if (!reservedUntil) {
+            return null;
+        }
+
+        const date = new Date(reservedUntil);
+
+        if (Number.isNaN(date.getTime())) {
+            return null;
+        }
+
+        return date.toLocaleTimeString([], {
+            hour: '2-digit',
+            minute: '2-digit',
+        });
+    };
+
     const notify = (msg) => {
         setToast(msg);
         setTimeout(() => setToast(null), 2500);
@@ -60,58 +77,67 @@ export default function Cart() {
             <div className="grid grid-cols-3 gap-6">
                 {/* ITEMS */}
                 <div className="col-span-2 space-y-4">
-                    {cart.items.map(item => (
-                        <div
-                            key={item.id}
-                            className="border rounded p-4 flex justify-between items-center bg-white"
-                        >
-                            <div>
+                    {cart.items.map(item => {
+                        const reservedTime = formatReservation(item.reserved_until);
+
+                        return (
+                            <div
+                                key={item.id}
+                                className="border rounded p-4 flex justify-between items-center bg-white"
+                            >
+                                <div>
                                 <div className="font-semibold">
                                     {item.product.name}
                                 </div>
                                 <div className="text-sm text-gray-500">
                                     ${item.product.price}
                                 </div>
-                            </div>
+                                    {reservedTime && (
+                                        <div className="text-xs text-gray-400">
+                                            Reserved until {reservedTime}
+                                        </div>
+                                    )}
+                                </div>
 
-                            <div className="flex items-center gap-3">
+                                <div className="flex items-center gap-3">
+                                    <button
+                                        onClick={() =>
+                                            updateCartItem(item.id, item.quantity - 1)
+                                                .then(loadCart)
+                                        }
+                                        disabled={item.quantity <= 1}
+                                        className="px-2 border rounded"
+                                    >
+                                        -
+                                    </button>
+
+                                    <span>{item.quantity}</span>
+
+                                    <button
+                                        onClick={() =>
+                                            updateCartItem(item.id, item.quantity + 1)
+                                                .then(loadCart)
+                                        }
+                                        disabled={
+                                            item.quantity >= item.product.stock_quantity
+                                        }
+                                        className="px-2 border rounded"
+                                    >
+                                        +
+                                    </button>
+                                </div>
+
                                 <button
                                     onClick={() =>
-                                        updateCartItem(item.id, item.quantity - 1)
-                                            .then(loadCart)
+                                        removeCartItem(item.id).then(loadCart)
                                     }
-                                    disabled={item.quantity <= 1}
-                                    className="px-2 border rounded"
+                                    className="text-red-600"
                                 >
-                                    -
-                                </button>
-
-                                <span>{item.quantity}</span>
-
-                                <button
-                                    onClick={() =>
-                                        updateCartItem(item.id, item.quantity + 1)
-                                            .then(loadCart)
-                                    }
-                                    disabled={
-                                        item.quantity >= item.product.stock_quantity
-                                    }
-                                    className="px-2 border rounded"
-                                >
-                                    +
+                                    Remove
                                 </button>
                             </div>
-
-                            <button
-                                onClick={() =>
-                                    removeCartItem(item.id).then(loadCart)
-                                }
-                                className="text-red-600"
-                            >
-                                Remove
-                            </button>
-                        </div>
-                    ))}
+                        );
+                    })}
                 </div>
 
                 {/* SUMMARY */}

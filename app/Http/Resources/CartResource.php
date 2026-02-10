@@ -21,6 +21,7 @@ class CartResource extends JsonResource
             'items' => $items->map(fn ($item) => [
                 'id' => $item->id,
                 'quantity' => $item->quantity,
+                'reserved_until' => $item->reserved_until?->toIso8601String(),
                 'product' => new ProductResource($item->product),
             ]),
 
