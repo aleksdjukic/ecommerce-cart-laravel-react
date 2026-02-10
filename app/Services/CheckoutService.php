@@ -6,6 +6,7 @@ use App\Events\ProductStockLow;
 use App\Exceptions\InsufficientStockException;
 use App\Models\Order;
 use App\Models\User;
+use App\Services\CartService;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 
@@ -19,6 +20,8 @@ class CheckoutService
                 ->with('items.product')
                 ->lockForUpdate()
                 ->firstOrFail();
+
+            app(CartService::class)->purgeExpiredReservations($cart);
 
             if ($cart->items->isEmpty()) {
                 throw new \RuntimeException('Cart is empty');

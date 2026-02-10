@@ -12,6 +12,30 @@ use Illuminate\Support\Facades\Log;
 
 class CartService
 {
+    private function reservationExpiry(): \DateTimeInterface
+    {
+        $minutes = (int) config('shop.cart_reservation_minutes', 20);
+
+        return now()->addMinutes($minutes);
+    }
+
+    public function purgeExpiredReservations(Cart $cart): void
+    {
+        $cart->items()
+            ->whereNotNull('reserved_until')
+            ->where('reserved_until', '<', now())
+            ->delete();
+    }
+
+    private function reservedQuantityForProduct(Product $product, Cart $excludeCart): int
+    {
+        return (int) CartItem::query()
+            ->where('product_id', $product->id)
+            ->whereNotNull('reserved_until')
+            ->where('reserved_until', '>=', now())
+            ->where('cart_id', '!=', $excludeCart->id)
+            ->sum('quantity');
+    }
     /**
      * Get existing cart or create new one for user
      */
@@ -28,6 +52,7 @@ class CartService
     public function addProduct(User $user, Product $product): void
     {
         $cart = $this->getOrCreateCart($user);
+        $this->purgeExpiredReservations($cart);
 
         DB::transaction(function () use ($cart, $product) {
 
@@ -38,25 +63,31 @@ class CartService
                 ->first();
 
             $currentQuantity = $item ? $item->quantity : 0;
+            $reservedQuantity = $this->reservedQuantityForProduct($product, $cart);
+            $availableStock = $product->stock_quantity - $reservedQuantity;
 
-            if ($currentQuantity + 1 > $product->stock_quantity) {
+            if ($currentQuantity + 1 > $availableStock) {
                 Log::warning('Insufficient stock when adding to cart', [
                     'product_id' => $product->id,
                     'requested' => $currentQuantity + 1,
-                    'available' => $product->stock_quantity,
+                    'available' => $availableStock,
                 ]);
 
                 throw new InsufficientStockException(
-                    "Only {$product->stock_quantity} item(s) available for {$product->name}"
+                    "Only {$availableStock} item(s) available for {$product->name}"
                 );
             }
 
             if ($item) {
                 $item->increment('quantity');
+                $item->update([
+                    'reserved_until' => $this->reservationExpiry(),
+                ]);
             } else {
                 $cart->items()->create([
                     'product_id' => $product->id,
                     'quantity' => 1,
+                    'reserved_until' => $this->reservationExpiry(),
                 ]);
             }
         });
@@ -79,20 +110,25 @@ class CartService
             /** @var Product $product */
             $product = $item->product()->lockForUpdate()->first();
 
-            if ($quantity > $product->stock_quantity) {
+            $this->purgeExpiredReservations($item->cart);
+            $reservedQuantity = $this->reservedQuantityForProduct($product, $item->cart);
+            $availableStock = $product->stock_quantity - $reservedQuantity;
+
+            if ($quantity > $availableStock) {
                 Log::warning('Insufficient stock when updating cart quantity', [
                     'product_id' => $product->id,
                     'requested' => $quantity,
-                    'available' => $product->stock_quantity,
+                    'available' => $availableStock,
                 ]);
 
                 throw new InsufficientStockException(
-                    "Only {$product->stock_quantity} item(s) available for {$product->name}"
+                    "Only {$availableStock} item(s) available for {$product->name}"
                 );
             }
 
             $item->update([
                 'quantity' => $quantity,
+                'reserved_until' => $this->reservationExpiry(),
             ]);
         });
     }

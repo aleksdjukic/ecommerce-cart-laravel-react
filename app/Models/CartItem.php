@@ -11,7 +11,11 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  */
 class CartItem extends Model
 {
-    protected $fillable = ['cart_id', 'product_id', 'quantity'];
+    protected $fillable = ['cart_id', 'product_id', 'quantity', 'reserved_until'];
+
+    protected $casts = [
+        'reserved_until' => 'datetime',
+    ];
 
     /**
      * @return BelongsTo<\App\Models\Cart, $this>

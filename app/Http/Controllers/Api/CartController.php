@@ -18,6 +18,7 @@ class CartController extends Controller
     public function show(Request $request, CartService $cartService)
     {
         $cart = $cartService->getOrCreateCart($request->user());
+        $cartService->purgeExpiredReservations($cart);
 
         return new CartResource($cart->load('items.product'));
     }
