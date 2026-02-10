@@ -190,15 +190,6 @@ Password: password
 
 ---
 
-## ⚠️ Tech debt / limitations
-
-- Demo auth and simple roles; no admin panel for user management.
-- Stock reservations are app-level and expire on access (no background cleanup).
-- Pricing is simplified (no taxes, shipping, discounts, or multi-currency).
-- No payment gateway integration.
-
----
-
 ## 📄 License
 
 MIT License
